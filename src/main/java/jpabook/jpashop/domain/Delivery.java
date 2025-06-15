@@ -1,9 +1,13 @@
 package jpabook.jpashop.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-public class Devlivery {
+@Setter
+@Getter
+public class Delivery {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "DELIVERY_ID")

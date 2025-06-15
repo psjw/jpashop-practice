@@ -22,8 +22,13 @@ public class Member {
     @Embedded
     private Address address;
 
+    //JPQL을 사용시 select o from order o;  -> SQL select * from order를 우선 조회하고
+    //각각 member에 대한 select쿼리가 나감
+    //XToOne인경우 OneToOne, ManyToOne은 기본 fetch가 EAGER다
+
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
+
 
 
 }

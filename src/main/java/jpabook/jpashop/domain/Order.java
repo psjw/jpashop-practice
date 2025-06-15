@@ -28,12 +28,18 @@ public class Order {
     private Member member;
 
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderItem> orderItem = new ArrayList<>();
+    //cascade = CascadeType.ALL order저장시 orderitems도 동시에 저장
+    // persist(orderItemA)
+    // persist(orderItemB)
+    // persist(orderItemC)
+    // persist(order)
+    // -> persist(order)만 하면 나머지 다 저장되면(delete도 동일)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "DELIVERY_ID")
-    private Devlivery devlivery;
+    private Delivery delivery;
 
 
     void changeMember(Member member) {
@@ -44,5 +50,21 @@ public class Order {
         member.getOrders().add(this);
     }
 
+
+    ///=== 연관관계 메서드 === ///
+    public void setMember(Member member){
+        this.member = member;
+        member.getOrders().add(this);
+    }
+
+    public void setOrderITem(OrderItem orderItem){
+        orderItems.add(orderItem);
+        orderItem.setOrder(this);
+    }
+
+    public void setDelivery(Delivery delivery){
+        this.delivery = delivery;
+        delivery.setOrder(this);
+    }
 
 }
