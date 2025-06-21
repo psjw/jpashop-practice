@@ -1,0 +1,39 @@
+###회원가입
+POST http://localhost:8080/api/v1/members
+Content-Type: application/json
+
+{
+"name": "hello"
+}
+
+###회원가입2
+POST http://localhost:8080/api/v1/members
+Content-Type: application/json
+
+
+###회원가입3
+POST http://localhost:8080/api/v2/members
+Content-Type: application/json
+
+{
+  "name": "hello3"
+}
+
+
+###회원가입3
+PUT http://localhost:8080/api/v2/members/1
+Content-Type: application/json
+
+{
+  "name": "helloworld"
+}
+
+
+###회원가입4
+GET http://localhost:8080/api/v1/members
+Content-Type: application/json
+
+
+###회원가입4
+GET http://localhost:8080/api/v2/members
+Content-Type: application/json
