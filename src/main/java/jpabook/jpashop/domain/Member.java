@@ -1,5 +1,6 @@
 package jpabook.jpashop.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
@@ -28,6 +29,7 @@ public class Member {
     //각각 member에 대한 select쿼리가 나감
     //XToOne인경우 OneToOne, ManyToOne은 기본 fetch가 EAGER다
 
+    @JsonIgnore
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
 

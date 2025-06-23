@@ -1,0 +1,16 @@
+###주문1
+GET http://localhost:8080/api/v1/simple-orders
+Content-Type: application/json
+
+###주문2
+GET http://localhost:8080/api/v2/simple-orders
+Content-Type: application/json
+
+
+###주문3
+GET http://localhost:8080/api/v3/simple-orders
+Content-Type: application/json
+
+###주문4
+GET http://localhost:8080/api/v4/simple-orders
+Content-Type: application/json
