@@ -99,5 +99,22 @@ public class OrderRepository {
     }
 
 
-
+    public List<Order> findAllWithItem() {
+        //JPA 2.x distinct를 넣어줌, JPA 3.x는 distinct 없어도 됨
+        //OneToMany -> distinct SQL distinct 추가 , 중복엔티티를 제거 후 담아줌 ->단점 페이징이 불가능
+        //2025-06-25T17:53:39.765+09:00  WARN 22911 --- [nio-8080-exec-1] org.hibernate.orm.query
+        // : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+        // 메모리에서 페이징 처리 함
+        // JPA 3.x 페이징도 가능
+        // Order 기준으로 페이징
+        return em.createQuery(
+                "select distinct o from Order o " +
+                        "join fetch o.member m " +
+                        "join fetch o.delivery d " +
+                        "join fetch o.orderItems oi " +
+                        "join fetch oi.item i", Order.class
+        ).setFirstResult(1)
+                .setMaxResults(100)
+                .getResultList();
+    }
 }
