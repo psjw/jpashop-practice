@@ -6,23 +6,31 @@ import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.query.OrderFlatDto;
+import jpabook.jpashop.repository.order.query.OrderItemQueryDto;
+import jpabook.jpashop.repository.order.query.OrderQueryDto;
+import jpabook.jpashop.repository.order.query.OrderQueryRepository;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.*;
+
 @RestController
 @RequiredArgsConstructor
 public class OrderApiController {
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
     @GetMapping("/api/v1/orders")
-    public List<Order> ordersV1(){
+    public List<Order> ordersV1() {
         //JSONIgnore 양방향 연관관계에 넣어주어야함
         List<Order> all = orderRepository.findAllByString(new OrderSearch());
         for (Order order : all) {
@@ -35,7 +43,7 @@ public class OrderApiController {
     }
 
     @GetMapping("/api/v2/orders")
-    public List<OrderDto> ordersV2(){
+    public List<OrderDto> ordersV2() {
         List<Order> orders = orderRepository.findAllByString(new OrderSearch());
         List<OrderDto> collect = orders.stream()
                 .map(o -> new OrderDto(o))
@@ -45,10 +53,10 @@ public class OrderApiController {
 
 
     @GetMapping("/api/v3/orders")
-    public List<OrderDto> ordersV3(){
+    public List<OrderDto> ordersV3() {
         List<Order> orders = orderRepository.findAllWithItem();
         for (Order order : orders) {
-            System.out.println("order = " + order+ " order.getId() = " + order.getId());
+            System.out.println("order = " + order + " order.getId() = " + order.getId());
         }
         List<OrderDto> collect = orders.stream()
                 .map(o -> new OrderDto(o))
@@ -57,8 +65,52 @@ public class OrderApiController {
     }
 
 
+    //was와 db의 부하를 고려해서 갯수 결정
+    //메모리는 옵션과 무관 왜냐하면 결국 결과가 로딩될떄까지 기다려야함 100이나 1000이나 동일
+    @GetMapping("/api/v3.1/orders")
+    public List<OrderDto> ordersV3_page(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "100") int limit
+    ) {
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
+        for (Order order : orders) {
+            System.out.println("order = " + order + " order.getId() = " + order.getId());
+        }
+        List<OrderDto> collect = orders.stream()
+                .map(o -> new OrderDto(o))
+                .collect(Collectors.toList());
+        return collect;
+    }
+
+    @GetMapping("/api/v4/orders")
+    public List<OrderQueryDto> ordersV4() {
+        return orderQueryRepository.findOrderQueryDtos();
+    }
+
+    @GetMapping("/api/v5/orders")
+    public List<OrderQueryDto> ordersV5() {
+        return orderQueryRepository.findAllByDto_optimization();
+    }
+
+    @GetMapping("/api/v6/orders")
+//    public List<OrderFlatDto> ordersV6() {
+    public List<OrderQueryDto> ordersV6() {
+        List<OrderFlatDto> flats = orderQueryRepository.findAllByDto_flat();
+        return flats.stream()
+                .collect(groupingBy(o -> new OrderQueryDto(o.getOrderId(),
+                                o.getName(), o.getOrderDate(), o.getOrderStatus(), o.getAddress()),
+                        mapping(o -> new OrderItemQueryDto(o.getOrderId(),
+                                o.getItemName(), o.getOrderPrice(), o.getCount()), toList())
+                )).entrySet().stream()
+                .map(e -> new OrderQueryDto(e.getKey().getOrderId(),
+                        e.getKey().getName(), e.getKey().getOrderDate(), e.getKey().getOrderStatus(),
+                        e.getKey().getAddress(), e.getValue()))
+                .collect(toList());
+    }
+
+
     @Data
-    static class OrderDto{
+    static class OrderDto {
 
         private Long orderId;
         private String name;
