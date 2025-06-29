@@ -28,6 +28,13 @@ import static java.util.stream.Collectors.*;
 public class OrderApiController {
     private final OrderRepository orderRepository;
     private final OrderQueryRepository orderQueryRepository;
+        //jpa.open-in-view: false 설정시 에러 -> 트랜잭션 안에서 실행하거나 fetch join 사용
+        // org.hibernate.LazyInitializationException: could not initialize proxy [jpabook.jpashop.domain.Member#1] - no Session
+        //	at org.hibernate.proxy.AbstractLazyInitializer.initialize(AbstractLazyInitializer.java:165) ~[hibernate-core-6.5.3.Final.jar:6.5.3.Final]
+        //	at org.hibernate.proxy.AbstractLazyInitializer.getImplementation(AbstractLazyInitializer.java:314) ~[hibernate-core-6.5.3.Final.jar:6.5.3.Final]
+        //	at org.hibernate.proxy.pojo.bytebuddy.ByteBuddyInterceptor.intercept(ByteBuddyInterceptor.java:44) ~[hibernate-core-6.5.3.Final.jar:6.5.3.Final]
+        //	at org.hibernate.proxy.ProxyConfiguration$InterceptorDispatcher.intercept(ProxyConfiguration.java:102) ~[hibernate-core-6.5.3.Final.jar:6.5.3.Final]
+
 
     @GetMapping("/api/v1/orders")
     public List<Order> ordersV1() {
